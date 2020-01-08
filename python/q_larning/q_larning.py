@@ -6,8 +6,21 @@
 # 概要:
 #      強化学習(Q 学習)の例題プログラム
 #
+# usage: pytho3 q_larning.py
+#
+# 更新履歴:
+#          2020.01.08 新規作成
+#          2020.01.08 Q 値の収束の具合を図示
+#
+import os
+import sys
 import logging
 import random
+import copy
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 # 定数定義
 GEN_MAX = 50  # 学習の繰り返し回数
@@ -44,6 +57,9 @@ class QLarning(object):
         # Q の値を乱数で初期化
         # 2次元配列の形状は [7,2]
         self.q = [[self._frand() for i in range(self.action_no)] for j in range(self.state_no)]
+
+        # Q 値の履歴情報(グラフを作成するために必要)
+        self.q_hist = []
         
     def _rand0or1(self):
         """0か1の数値の何方かを返却する乱数"""
@@ -94,15 +110,34 @@ class QLarning(object):
             x = "s:{} ↑: {} ↓:{}".format(s, state[self.up], state[self.down])
             print(x)
             s += 1
-            
+
+    def graph(self, image):
+        """Q 値の収束の具合を図示するための関数"""
+        fig, ax = plt.subplots(ncols=1, figsize=(9,8))       
+        x = np.asarray([ i for i in range(self.gen_max)])
+        # self.q_hist.shape = [step, state, action]
+        # q_hist.shape = [state, action, step]
+        q_hist = np.asarray(self.q_hist).transpose(1,2,0)
+        s = 0
+        for up, down in q_hist:
+            #ax.plot(x, up, marker="o", label="s:{},up".format(s))
+            #ax.plot(x, down, marker="o", label="s:{},down".format(s))
+            ax.plot(x, up, label="s:{},up".format(s))
+            ax.plot(x, down, label="s:{},down".format(s))
+            s += 1
+        ax.set_title('Q-Larninig')
+        ax.set_xlabel('generation')
+        ax.set_ylabel('q value')
+        ax.legend(loc='upper left')        
+        fig.savefig(image)
+        plt.close()
+        
     def train(self):
         """学習関数"""
-
         # 世代のループ
         for gen in range(self.gen_max):
             # 行動の初期状態
             state = 0
-            
             # 探索レベルのループ
             for lev in range(self.level):
                 # 行動の選択
@@ -112,20 +147,24 @@ class QLarning(object):
 
                 # Q の更新
                 self.q[state][action] = self._update_q(state, state_next, action)
-
+                
                 # 行動により次の状態へ遷移
-                state =state_next
-
+                state = state_next
             # Q の出力
             self.print_q_value()
-
+            # Q の履歴を保存する(グラフ用)
+            self.q_hist.append(copy.deepcopy(self.q))
             
+
 def main():
     # logger の設定
     logging.basicConfig(level=logging.INFO,format='[%(asctime)s] %(levelname)s -- : %(message)s')
     logger = logging.getLogger()
     logger.info("*** start q_larning ***")
-    QLarning(logger).train()
+    ql = QLarning(logger)
+    ql.train()
+    ql.graph("q_value.png")
+    
     logger.info("*** stop q_larning ***")
 
     
