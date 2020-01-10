@@ -122,8 +122,6 @@ class QLarning(object):
         q_hist = np.asarray(self.q_hist).transpose(1,2,0)
         s = 0
         for up, down in q_hist:
-            #ax.plot(x, up, marker="o", label="s:{},up".format(s))
-            #ax.plot(x, down, marker="o", label="s:{},down".format(s))
             ax.plot(x, up, label="s:{},up".format(s))
             ax.plot(x, down, label="s:{},down".format(s))
             s += 1
@@ -166,7 +164,6 @@ def main():
     ql = QLarning(logger)
     ql.train()
     ql.graph("q_value.png")
-    
     logger.info("*** stop q_larning ***")
 
     
