@@ -24,14 +24,14 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 # 定数定義
-GEN_MAX = 1 # 学習の繰り返し回数
+GEN_MAX = 50  # 学習の繰り返し回数
 STATE_NO = 64 # 状態(8x8 のstate) の数
 ACTION_NO = 4 # 行動の自由度(数)
 ALPHA = 0.1   # 学習係数
 GAMMA = 0.9   # 割引率
 EPSILON = 0.3 # 行動選択のランダム率
 REWARD = 10   # ゴール時の報酬
-GOAL = 54      # ゴールの状態の番号
+GOAL = 54     # ゴールの状態の番号
 UP = 0        # 上方向への行動
 DOWN = 1      # 下方向への行動
 LEFT = 2      # 左方向へ移動
@@ -61,7 +61,7 @@ class QLarning(object):
         
         # Q の値を乱数で初期化(境界条件を考慮)
         # 2次元配列の形状は [64,4]
-        self.q = self._init_q() 
+        self.q = self._init_q()
         
         # Q 値の履歴情報(グラフを作成するために必要)
         self.q_hist = []
@@ -70,19 +70,19 @@ class QLarning(object):
         """Q の初期化(境界条件含む)"""
         q = [[self._frand() for i in range(self.action_no)] for j in range(self.state_no)]
         for i in range(self.state_no):
-            for j in range(self.action_no):
+            for _ in range(self.action_no):
+                # 上辺の境界条件
                 if i <= 7:
-                    # 上辺の境界条件
-                    q[i][self.up] = 0.0
-                elif i >= 56:
-                    # 下辺の境界条件
-                    q[i][self.down] = 0.0
-                elif i % 8 == 0:
-                    # 左辺の境界条件
-                    q[i][self.left] = 0.0
-                elif i % 8 == 7:
-                    # 右辺の境界条件
-                    q[i][self.right] = 0.0
+                    q[i][self.up] = -100.0
+                # 下辺の境界条件
+                if i >= 56:
+                    q[i][self.down] = -100.0
+                # 左辺の境界条件
+                if i % 8 == 0:
+                    q[i][self.left] = -100.0
+                # 右辺の境界条件
+                if i % 8 == 7:
+                    q[i][self.right] = -100.0
         return q
         
     def _rand0or1(self):
@@ -105,7 +105,7 @@ class QLarning(object):
             # ランダムに行動を選択
             while True:
                 action = self._rand03()
-                # 境界条件でQ 値が負値であればループ
+                # 境界条件でQ 値が正値であれば処理を終了
                 if self.q[state][action] > 0.0:
                     return action
         else:
@@ -127,7 +127,8 @@ class QLarning(object):
         """行動(action)のよって状態(status)をupdateする"""
         # 8x8 のマトリクスなので以下の構造となる
         next_state_matrix = [-8, 8, -1, 1]
-        return status + next_state_matrix[action]
+        ret = status + next_state_matrix[action]
+        return ret
     
     def _update_q(self, status, status_next, action):
         """Q の値を更新する"""
@@ -137,13 +138,6 @@ class QLarning(object):
             qv = self.q[status][action] + self.alpha * (self.reward - self.q[status][action])
         else:
             # 報酬がない場合
-
-            print("***")
-            print(status)
-            print(status_next)
-            print(action)
-            print("***")
-            
             qv = self.q[status][action] + self.alpha * (self.gamma * self.q[status_next][self._set_action_by_q(status_next)] - self.q[status][action])
         return qv
             
@@ -163,10 +157,13 @@ class QLarning(object):
         # q_hist.shape = [state, action, step]
         q_hist = np.asarray(self.q_hist).transpose(1,2,0)
         s = 0
-        for up, down in q_hist:
+        for up, down, left, right in q_hist:
             ax.plot(x, up, label="s:{},up".format(s))
             ax.plot(x, down, label="s:{},down".format(s))
+            ax.plot(x, left, label="s:{},left".format(s))
+            ax.plot(x, right, label="s:{},right".format(s))
             s += 1
+
         ax.set_title('Q-Larninig')
         ax.set_xlabel('generation')
         ax.set_ylabel('q value')
@@ -186,7 +183,7 @@ class QLarning(object):
                 action = self._select_action(state)
                 self.logger.info("status: {} action: {}".format(state, action))
                 state_next = self._nexts(state, action)
-                
+
                 # Q の更新
                 self.q[state][action] = self._update_q(state, state_next, action)
                 
@@ -195,7 +192,6 @@ class QLarning(object):
                 
                 # ゴールしたら探索終了
                 if state == self.goal:
-                    print("goal")
                     break
             
             # Q の出力
@@ -212,7 +208,6 @@ def main():
     ql = QLarning(logger)
     ql.train()
     ql.graph("q_value.png")
-    
     logger.info("*** stop q_larning ***")
 
     
