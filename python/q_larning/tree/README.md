@@ -3,7 +3,7 @@ Q学習の例題を実際に実装してみて動作を確認する。
 ## 探索経路が木構造
 探索経路が非常にシンプルは2分木構造になっている例での実装とします。構造は以下の通り
 <p align="center">
-<img src="images/q_larning_tree.png" width="400px"><br>
+<img src="images/q_larning_tree.png" width="500px"><br>
 FIG:1 各Qの値の世代依存性
 </p>
 
@@ -59,7 +59,7 @@ status(0) →  down ↓ →　status(2) →　 down ↓ → status(6) ・・・g
 ```
 各Qの値の世代依存性を見ると以下のようになっています。
 <p align="center">
-<img src="images/q_value.png" width="500px"><br>
+<img src="images/q_value.png" width="600px"><br>
 FIG:2 各Qの値の世代依存性
 </p>
 Q(1,down),Q(2,down)の値が世代を進むに従って増えているのがわかります。また最初にゴールの直近のQ(2,down)が増えて遅れてQ(1,down)が増加している点も注目です。
