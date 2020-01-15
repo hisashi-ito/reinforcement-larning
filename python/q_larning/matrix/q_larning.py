@@ -12,11 +12,13 @@
 #          2020.01.08 新規作成
 #          2020.01.08 Q 値の収束の具合を図示
 #          2020.01.09 探索経路がマトリクス
+#          2020.01.15
 #
 import os
 import sys
 import logging
 import random
+import math
 import copy
 import numpy as np
 import matplotlib
@@ -30,7 +32,7 @@ ACTION_NO = 4 # 行動の自由度(数)
 ALPHA = 0.1   # 学習係数
 GAMMA = 0.9   # 割引率
 EPSILON = 0.3 # 行動選択のランダム率
-REWARD = 10   # ゴール時の報酬
+REWARD = 100  # ゴール時の報酬
 GOAL = 54     # ゴールの状態の番号
 UP = 0        # 上方向への行動
 DOWN = 1      # 下方向への行動
@@ -149,6 +151,21 @@ class QLarning(object):
             print(x)
             s += 1
 
+    def print_max_q_value(self):
+        arrows = ["↑", "↓", "←", "→"]
+        # 8x8の行列で最大の数を表示する
+        length = int(math.sqrt(self.state_no))
+        pic = ""
+        for i in range(length):
+            _pic = ""
+            for j in range(length):
+                best_action = np.argmax(self.q[i+j])
+                _pic += arrows[best_action]
+            pic += _pic + "\n"
+        print("***")
+        print(pic)
+        print("***")
+        
     def graph(self, image):
         """Q 値の収束の具合を図示するための関数"""
         fig, ax = plt.subplots(ncols=1, figsize=(9,8))       
@@ -181,7 +198,7 @@ class QLarning(object):
             for lev in range(self.level):
                 # 行動の選択
                 action = self._select_action(state)
-                self.logger.info("status: {} action: {}".format(state, action))
+                #self.logger.info("status: {} action: {}".format(state, action))
                 state_next = self._nexts(state, action)
 
                 # Q の更新
@@ -193,9 +210,11 @@ class QLarning(object):
                 # ゴールしたら探索終了
                 if state == self.goal:
                     break
+
             
             # Q の出力
-            self.print_q_value()
+            #self.print_q_value()
+            self.print_max_q_value()
             # Q の履歴を保存する(グラフ用)
             self.q_hist.append(copy.deepcopy(self.q))
             
