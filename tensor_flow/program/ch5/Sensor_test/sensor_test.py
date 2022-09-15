@@ -1,0 +1,1 @@
+'''RaspberryPi用入力テスト用プログラムCopyright(c) 2020 Koji Makino and Hiromitsu Nishizaki All Rights Reserved.'''import timeimport RPi.GPIO as GPIOtime.sleep(1)GPIO.setmode(GPIO.BOARD)#ピン配置の番号を使用GPIO.setup(22, GPIO.IN)#22番ピンを入力while(1):  print(GPIO.input(22))  time.sleep(0.5)

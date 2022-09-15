@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<robot name="bulldozer">
+
+  <link name="bull">
+    <visual>
+      <geometry>
+        <box size="0.6 1.0 0.38"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+      <material name="gray">
+        <color rgba="0.6 0.6 0.6 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.6 1.0 0.38"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+
+  <link name="wheelR">
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="black">
+        <color rgba="0.2 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <inertial>
+    <origin xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+<collision>
+      <geometry>
+        <cylinder length="0.1" radius="0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.0"/>
+    </collision>
+  	<contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <damping value="100000"/>
+    </contact>
+  </link>
+
+  <link name="wheelL">
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="black">
+        <color rgba="0.2 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <inertial>
+    <origin xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <collision>
+      <geometry>
+        <cylinder length="0.1" radius="0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0.0"/>
+    </collision>
+  	<contact>
+      <lateral_friction value="1.0"/>
+      <rolling_friction value="0.0"/>
+      <damping value="100000"/>
+    </contact>
+  </link>
+
+  <joint name="bull_to_wheelR" type="continuous">
+    <axis xyz="1 0 0"/>
+    <origin xyz="0.4 0.0 0"/>
+    <parent link="bull"/>
+    <child link="wheelR"/>
+  </joint>
+
+  <joint name="bull_to_wheelL" type="continuous">
+    <axis xyz="1 0 0"/>
+    <origin xyz="-0.4 0.0 0"/>
+    <parent link="bull"/>
+    <child link="wheelL"/>
+  </joint>
+
+  
+</robot>
