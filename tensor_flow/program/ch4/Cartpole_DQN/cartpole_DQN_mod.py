@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import tensorflow as tf
+import gym
 from tensorflow import keras
 
 from tf_agents.environments import gym_wrapper, py_environment, tf_py_environment
@@ -13,10 +14,6 @@ from tf_agents.trajectories import trajectory
 from tf_agents.specs import array_spec
 from tf_agents.utils import common
 from tf_agents.drivers import dynamic_step_driver, dynamic_episode_driver
-
-import gym
-import numpy as np
-import time
 
 class QNetwork(network.Network):
     def __init__(self, observation_spec, action_spec, n_hidden_channels=50, name='QNetwork'):
@@ -60,7 +57,7 @@ def main():
     n_step_update = 1
 
     agent = dqn_agent.DqnAgent(
-        env.time_step_spec()
+        env.time_step_spec(),
         env.action_spec(),
         q_network=policy_network,
         optimizer=keras.optimizers.Adam(
